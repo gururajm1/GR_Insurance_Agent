@@ -1,0 +1,60 @@
+{
+  "name": "enhanced-insurance-claim-agent",
+  "version": "1.0.0",
+  "description": "Enhanced insurance claim processing agent with ElevenLabs integration",
+  "main": "src/agents/enhanced-insurance-agent.js",
+  "scripts": {
+    "start": "node src/agents/enhanced-insurance-agent.js",
+    "server": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "webhook": "node webhooks/elevenlabs/elevenlabs-webhook.js",
+    "dev-webhook": "nodemon webhooks/elevenlabs/elevenlabs-webhook.js",
+    "test": "node test-with-mock-data.js",
+    "test-api": "node test-api.js",
+    "test-email": "node test-email.js",
+    "test-webhook": "node test-webhook.js",
+    "db:schema": "node database/schemas/zilliz-schemas.js",
+    "db:seed": "node database/seeders/insert-demo-policies.js",
+    "db:populate": "node database/seeders/temp_populate_policy_collection.js",
+    "db:setup": "node database/seeders/policy_setup_temp.js",
+    "install-deps": "npm install",
+    "clean": "rm -rf node_modules package-lock.json && npm install",
+    "health-check": "node -e \"console.log('Node.js version:', process.version); console.log('All dependencies installed successfully!');\""
+  },
+  "keywords": [
+    "insurance",
+    "claim",
+    "processing",
+    "ai",
+    "milvus",
+    "vector",
+    "embeddings",
+    "elevenlabs",
+    "voice-agent"
+  ],
+  "author": "Enhanced Insurance Team",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@zilliz/milvus2-sdk-node": "^2.6.0",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "imap": "^0.8.19",
+    "mailparser": "^3.7.4",
+    "mammoth": "^1.10.0",
+    "node-html-parser": "^6.1.13",
+    "nodemailer": "^6.9.8",
+    "openai": "^4.67.3",
+    "pdf-parse": "^1.1.1",
+    "readline-sync": "^1.4.10",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
