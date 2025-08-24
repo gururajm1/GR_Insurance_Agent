@@ -1,249 +1,329 @@
-# 🏥 Insurance Claim Support Agent
+# Enhanced Insurance Claim Agent - Installation Guide
 
-AI-powered insurance claim processing agent with human-in-the-loop approval system, built with Portia-style architecture.
+## Prerequisites
 
-## 🚀 Quick Start
+- **Node.js**: Version 16.0.0 or higher
+- **npm**: Version 8.0.0 or higher (comes with Node.js)
+- **Git**: For cloning the repository
 
-### Prerequisites
-- **Node.js** (v16 or higher)
-- **NPM** package manager
-- **Milvus** vector database (local or Zilliz Cloud)
+## Installation Steps
 
-### 1. Clone and Install
+### 1. Clone the Repository
 ```bash
-# Navigate to project directory
-cd insurance-claim-agent
+git clone <your-repository-url>
+cd insurance-claim-agent-copy-3
+```
 
-# Install dependencies
+### 2. Install Dependencies
+```bash
+# Install all required dependencies
 npm install
+
+# Or use the custom script
+npm run install-deps
 ```
 
-### 2. Environment Setup
+### 3. Environment Setup
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Gemini AI API Keys (Primary + Backup)
+GEMINI_API_KEY=your_primary_gemini_api_key
+GEMINI_API_KEY_1=your_backup_gemini_api_key_1
+GEMINI_API_KEY_2=your_backup_gemini_api_key_2
+
+# Milvus Vector Database
+MILVUS_URI=your_milvus_cluster_uri
+MILVUS_TOKEN=your_milvus_token
+
+# Email Configuration
+GMAIL_EMAIL=your_gmail_address
+GMAIL_APP_PASSWORD=your_gmail_app_password
+COMPANY_EMAIL=your_company_email
+
+# OpenAI/Kimi K2 Fallback (Optional)
+KIMI_K2_KEY=your_openrouter_api_key
+
+# ElevenLabs (Optional - for voice features)
+ELEVENLABS_API_KEY=your_elevenlabs_api_key
+```
+
+### 4. Verify Installation
 ```bash
-# Copy environment template
-cp .env.example .env
+# Check if all dependencies are installed correctly
+npm run health-check
 
-# Edit .env file with your API keys
-nano .env  # or use any text editor
+# Test the basic functionality
+npm test
 ```
 
-### 3. Configure API Keys
+## Dependencies Overview
 
-#### Google Gemini API Key (FREE!)
-1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Add to `.env`: `GEMINI_API_KEY=AIza...`
+### Core Dependencies
+- **@google/generative-ai**: Google's Gemini AI SDK
+- **@zilliz/milvus2-sdk-node**: Milvus vector database client
+- **axios**: HTTP client for API requests
+- **cors**: Cross-origin resource sharing middleware
+- **dotenv**: Environment variable loader
+- **express**: Web framework for API server
 
-#### Gmail App Password Setup (Super Simple!)
-1. **Enable 2-Factor Authentication** on your Gmail account
-2. Go to [Google App Passwords](https://myaccount.google.com/apppasswords)
-3. Select app: "Mail" or "Other (custom name)"
-4. Generate 16-character app password
-5. Add to `.env`:
-   ```
-   GMAIL_EMAIL=your_email@gmail.com
-   GMAIL_APP_PASSWORD=abcd efgh ijkl mnop  # (remove spaces)
-   ```
+### Email & Communication
+- **imap**: IMAP client for reading emails
+- **mailparser**: Email parsing utilities
+- **nodemailer**: Email sending capabilities
 
-#### Tavily API Key
-1. Sign up at [tavily.com](https://tavily.com)
-2. Get API key from dashboard
-3. Add to `.env`: `TAVILY_API_KEY=tvly-...`
+### Document Processing
+- **mammoth**: Microsoft Word document processing
+- **pdf-parse**: PDF document parsing
+- **node-html-parser**: HTML parsing utilities
 
-#### Milvus Setup Options
+### AI & Fallback
+- **openai**: OpenAI client (used for Kimi K2 fallback)
+- **readline-sync**: Synchronous user input handling
 
-**Option A: Local Milvus (Docker)**
+### WebSocket & Real-time
+- **ws**: WebSocket implementation
+
+### Development
+- **nodemon**: Development server with auto-restart
+
+## Available Scripts
+
+### Production Scripts
 ```bash
-# Start Milvus with Docker
-curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh | bash -s start
-
-# Add to .env
-MILVUS_URI=http://localhost:19530
+npm start              # Start the enhanced insurance agent
+npm run server         # Start the API server
+npm run webhook        # Start ElevenLabs webhook server
 ```
 
-**Option B: Zilliz Cloud (Recommended)**
-1. Sign up at [cloud.zilliz.com](https://cloud.zilliz.com)
-2. Create new cluster (free tier available)
-3. Get connection URI and token
-4. Add to `.env`:
-   ```
-   MILVUS_URI=https://your-cluster.vectordb.zilliz.com:19530
-   MILVUS_TOKEN=your_token
-   ```
-
-### 4. Test Gmail Connection
+### Development Scripts
 ```bash
-# Test email access (optional)
-node -e "
-const { google } = require('googleapis');
-require('dotenv').config();
-
-const oauth2Client = new google.auth.OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET
-);
-oauth2Client.setCredentials({
-    refresh_token: process.env.GMAIL_REFRESH_TOKEN
-});
-
-const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-gmail.users.getProfile({ userId: 'me' })
-    .then(res => console.log('✓ Gmail connected:', res.data.emailAddress))
-    .catch(err => console.error('✗ Gmail error:', err.message));
-"
+npm run dev            # Start server in development mode
+npm run dev-webhook    # Start webhook in development mode
 ```
 
-## 🧪 Testing the Agent
-
-### Test Data Preparation
-
-1. **Create test email with documents**:
-   - Send an email to your Gmail from the test email address
-   - Attach sample medical bill (PDF/DOCX)
-   - Include hospital details, treatment info, amounts
-
-2. **Sample test document content**:
-   ```
-   HOSPITAL BILL
-   Patient: John Doe
-   Date: 2024-01-15
-   Procedure: Emergency Surgery - Appendectomy
-   Hospital: City General Hospital
-   Total Amount: $5,500
-   Insurance Claim Amount: $5,000
-   ```
-
-### Run the Agent
-
+### Testing Scripts
 ```bash
-# Start the agent
-npm start
-
-# Or directly
-node insurance-agent.js
+npm test               # Run basic tests
+npm run test-api       # Test API endpoints
+npm run test-email     # Test email functionality
+npm run test-webhook   # Test webhook functionality
 ```
 
-### Test Flow
+### Database Scripts
+```bash
+npm run db:schema      # Set up database schemas
+npm run db:seed        # Seed with demo data
+npm run db:populate    # Populate policy collection
+npm run db:setup       # Complete database setup
+```
 
-1. **Agent starts** and initializes connections
-2. **Enter test data** when prompted:
-   ```
-   Email: test@example.com
-   Insurance Company: ABC Insurance
-   Policy: Health Plus Premium
-   Purchase Year: 2022
-   Claim Reason: Emergency appendectomy surgery
-   ```
+### Utility Scripts
+```bash
+npm run health-check   # Verify installation
+npm run clean          # Clean install (removes node_modules)
+```
 
-3. **Agent processes**:
-   - ✓ Checks for excluded conditions
-   - ✓ Searches Gmail for documents
-   - ✓ Searches policy documents online
-   - ✓ Creates vector embeddings
-   - ✓ Analyzes claim vs policy
-
-4. **Human approval prompt**:
-   ```
-   🤖 HUMAN-IN-THE-LOOP CLARIFICATION REQUIRED
-   ============================================
-   Email: test@example.com
-   Score: 0.5
-   Reason: Covered procedure but requires review
-   ============================================
-   
-   Do you approve this claim? (y/N):
-   ```
-
-5. **Final email notifications** sent
-
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
-**Gmail API Errors**
-```bash
-# Check OAuth setup
-Error: invalid_grant
-→ Refresh token expired, generate new one
+1. **Node.js Version Error**
+   ```bash
+   # Check your Node.js version
+   node --version
+   
+   # Should be 16.0.0 or higher
+   ```
 
-Error: insufficient permissions  
-→ Enable Gmail API in Google Cloud Console
+2. **Missing Dependencies**
+   ```bash
+   # Clean reinstall
+   npm run clean
+   ```
+
+3. **API Key Issues**
+   - Ensure all required API keys are in your `.env` file
+   - Check that API keys are valid and have proper permissions
+
+4. **Network Issues**
+   ```bash
+   # Clear npm cache
+   npm cache clean --force
+   
+   # Try installing with verbose logging
+   npm install --verbose
+   ```
+
+### Getting Help
+
+If you encounter issues:
+1. Check the console output for specific error messages
+2. Verify all environment variables are set correctly
+3. Ensure you have the required Node.js version
+4. Try a clean installation with `npm run clean`
+
+## Next Steps
+
+After successful installation:
+1. Configure your `.env` file with valid API keys
+2. Run `npm run db:setup` to initialize the database
+3. Test the system with `npm test`
+4. Start the server with `npm run dev`
+
+Your Enhanced Insurance Claim Agent should now be ready to use!
+
+
+
+# 📁 Project Structure
+
+This document outlines the improved file structure for the Enhanced Insurance Claim Agent project.
+
+## 🏗️ Directory Structure
+
+```
+insurance-claim-agent/
+├── 📁 src/                           # Source code
+│   ├── 📁 agents/                    # Insurance agent implementations
+│   │   ├── enhanced-insurance-agent.js      # Main enhanced agent
+│   │   ├── working-email-agent.js           # Email-focused agent
+│   │   ├── insurance-agent-portia-style.js  # Portia architecture agent
+│   │   ├── insurance-agent.js               # Basic agent
+│   │   └── portia-mcp-style.js             # MCP style agent
+│   ├── 📁 services/                  # Service layer (future)
+│   ├── 📁 models/                    # Data models (future)
+│   └── server.js                     # Express server
+│
+├── 📁 webhooks/                      # Webhook integrations
+│   └── 📁 elevenlabs/               # ElevenLabs webhook
+│       └── elevenlabs-webhook.js     # ElevenLabs webhook handler
+│
+├── 📁 database/                      # Database related files
+│   ├── 📁 schemas/                   # Database schemas
+│   │   └── zilliz-schemas.js         # Milvus/Zilliz collection schemas
+│   └── 📁 seeders/                   # Data seeders
+│       ├── insert-demo-policies.js   # Demo policy data
+│       ├── temp_populate_policy_collection.js  # Policy population
+│       └── policy_setup_temp.js      # Policy setup script
+│
+├── 📁 utils/                         # Utility functions (future)
+│   ├── 📁 email/                     # Email utilities
+│   └── 📁 file-processing/           # File processing utilities
+│
+├── 📁 docs/                          # Documentation
+│   ├── 📁 api/                       # API documentation
+│   ├── 📁 setup/                     # Setup guides
+│   ├── API_DOCUMENTATION.md          # API documentation
+│   ├── ELEVENLABS_INTEGRATION_GUIDE.md  # ElevenLabs integration
+│   ├── ELEVENLABS_WEBHOOK_GUIDE.md   # Webhook setup guide
+│   ├── ELEVENLABS_POST_CALL_TRANSCRIPTION_SETUP.md  # Transcription setup
+│   ├── SETUP_AND_TEST.md            # Setup and testing guide
+│   └── README.md                     # Main project README
+│
+├── 📁 scripts/                       # Build and deployment scripts
+│   ├── 📁 database/                  # Database scripts
+│   └── 📁 deployment/                # Deployment scripts
+│
+├── 📁 config/                        # Configuration files
+│   └── 📁 env/                       # Environment configs
+│
+├── 📁 tmp/                          # Temporary files
+├── 📁 node_modules/                 # Dependencies
+├── package.json                     # Project configuration
+├── package-lock.json               # Dependency lock file
+├── .gitignore                      # Git ignore rules
+└── PROJECT_STRUCTURE.md            # This file
 ```
 
-**Milvus Connection Issues**
+## 📋 File Organization Principles
+
+### 🎯 **src/agents/**
+Contains all insurance agent implementations:
+- **enhanced-insurance-agent.js** - Main production agent with full features
+- **working-email-agent.js** - Simplified email-focused agent
+- **insurance-agent-portia-style.js** - Agent using Portia architecture
+- **insurance-agent.js** - Basic agent implementation
+- **portia-mcp-style.js** - MCP style implementation
+
+### 🔌 **webhooks/**
+Webhook integrations organized by service:
+- **elevenlabs/** - ElevenLabs voice AI webhook integration
+
+### 🗄️ **database/**
+Database-related files organized by purpose:
+- **schemas/** - Database collection schemas and structures
+- **seeders/** - Scripts to populate database with test/demo data
+
+### 📚 **docs/**
+All documentation organized by type:
+- **api/** - API documentation and references
+- **setup/** - Setup and installation guides
+- Various markdown files for specific integrations
+
+### ⚙️ **utils/** (Future)
+Utility functions organized by domain:
+- **email/** - Email processing utilities
+- **file-processing/** - Document processing utilities
+
+## 🚀 Updated NPM Scripts
+
+The package.json has been updated with organized scripts:
+
+### Application Scripts
 ```bash
-# Test Milvus connection
-node -e "
-const { MilvusClient } = require('@milvus-io/milvus2-sdk-node');
-const client = new MilvusClient({ address: 'http://localhost:19530' });
-client.checkHealth().then(console.log).catch(console.error);
-"
+npm start          # Run main agent
+npm run server     # Run Express server
+npm run dev        # Run server in development mode
 ```
 
-**Gemini API Errors**
+### Webhook Scripts
 ```bash
-# Check API key
-Error: API_KEY_INVALID
-→ Verify API key in .env file
-
-Error: QUOTA_EXCEEDED
-→ Check daily quota at AI Studio (free tier has generous limits)
+npm run webhook     # Run ElevenLabs webhook
+npm run dev-webhook # Run webhook in development mode
 ```
 
-### Debug Mode
+### Database Scripts
 ```bash
-# Enable debug logging
-DEBUG=* node insurance-agent.js
+npm run db:schema   # Setup database schemas
+npm run db:seed     # Insert demo policies
+npm run db:populate # Populate policy collection
+npm run db:setup    # Setup policies
 ```
 
-## 📊 Testing Different Scenarios
+### Testing Scripts
+```bash
+npm test           # Run tests
+npm run test-api   # Run API tests
+```
 
-### 1. Auto-Approve Scenario (Score: 1.0)
-- **Condition**: Standard covered procedure
-- **Hospital**: Network hospital
-- **Documents**: Complete medical records
-- **Expected**: Auto-approval email
+## 🔄 Migration Benefits
 
-### 2. Human Review Scenario (Score: 0.5)
-- **Condition**: Partially covered procedure
-- **Hospital**: Out-of-network
-- **Documents**: Incomplete records
-- **Expected**: Human review prompt
+### ✅ **Improved Organization**
+- Clear separation of concerns
+- Logical grouping of related files
+- Easier navigation and maintenance
 
-### 3. Auto-Reject Scenario (Score: 0.0)
-- **Condition**: Excluded condition (cosmetic)
-- **Hospital**: Any
-- **Documents**: Any
-- **Expected**: Auto-rejection email
+### ✅ **Better Scalability**
+- Room for future services and utilities
+- Modular architecture support
+- Easy to add new agents or integrations
 
-## 📈 Performance Monitoring
+### ✅ **Enhanced Developer Experience**
+- Intuitive file locations
+- Organized documentation
+- Clear npm scripts for common tasks
 
-The agent logs key metrics:
-- **Processing time** for each step
-- **Embedding generation** duration
-- **API response times**
-- **Success/failure rates**
+### ✅ **Maintainability**
+- Easier to find and modify files
+- Reduced cognitive load
+- Better code organization
 
-## 🔒 Security Notes
+## 📝 Notes
 
-- **Never commit** `.env` file to version control
-- **Use separate** API keys for development/production
-- **Rotate keys** regularly
-- **Monitor API usage** and set billing alerts
+- All existing functionality remains unchanged
+- Import paths have been updated automatically
+- NPM scripts reflect new file locations
+- Documentation is centralized in `/docs`
+- Database operations are grouped in `/database`
 
-## 📝 Production Deployment
-
-1. **Use environment variables** instead of `.env` file
-2. **Set up monitoring** and alerting
-3. **Configure log aggregation**
-4. **Set up backup** for Milvus data
-5. **Use production-grade** email service (not personal Gmail)
-
-## 🆘 Support
-
-For issues:
-1. Check logs for error messages
-2. Verify all API keys are valid
-3. Test individual components separately
-4. Check network connectivity to services
+This structure follows modern Node.js project conventions and provides a solid foundation for future development.
